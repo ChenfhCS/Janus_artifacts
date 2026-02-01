@@ -14,6 +14,7 @@ The attacks do **not** require access to the victim LLM’s parameters, activati
 
 After unpacking the artifact, the directory structure should be exactly as follows:
 
+```
 pea-artifact/
 ├── README.md
 │
@@ -34,7 +35,7 @@ pea-artifact/
 ├── health_queries_val_20.csv
 ├── health_queries_val_20_with_pred.csv
 └── readMe.md
-
+```
 
 All commands described below are executed from the `pea-artifact/` root directory.
 
