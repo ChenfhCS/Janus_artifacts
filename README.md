@@ -15,7 +15,7 @@ The attacks do **not** require access to the victim LLM’s parameters, activati
 After unpacking the artifact, the directory structure should be exactly as follows:
 
 ```
-pea-artifact/
+janus-artifact/
 ├── README.md
 │
 ├── prefill_attribute_inference/
@@ -37,7 +37,7 @@ pea-artifact/
 └── readMe.md
 ```
 
-All commands described below are executed from the `pea-artifact/` root directory.
+All commands described below are executed from the `janus-artifact/` root directory.
 
 ---
 
