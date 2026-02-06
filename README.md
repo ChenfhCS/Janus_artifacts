@@ -2,7 +2,7 @@
 
 This artifact contains the implementation and pretrained models for the two inference attacks described in the paper:
 
-1. **Prefill-Phase Prompt Attribute Inference (PAI)**  
+1. **Prefill-Phase Query Attribute Inference (QAI)**  
 2. **Decoding-Phase Autoregressive Token Recovery (ATR)**
 
 Both attacks operate on *reconstructed sparsity patterns* derived from sparsity-induced memory access (SIMA) traces collected during LLM inference.  
