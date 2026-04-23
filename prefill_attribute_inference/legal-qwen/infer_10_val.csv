@@ -1,0 +1,11 @@
+﻿index,query,true_label,pred_label,pred_prob
+29,Five Ways to Spot a POA Scam,Family & Marriage,Family & Marriage,0.8317989706993103
+47,How To Find Out If Someone Is Married,Family & Marriage,Family & Marriage,0.7925735712051392
+42,What Rights Do Convicted Felons Lose?,Family & Marriage,Family & Marriage,0.764096736907959
+27,How To Petition The Court,Family & Marriage,Family & Marriage,0.7606080770492554
+34,How To Fight A Restraining Order,Family & Marriage,Family & Marriage,0.7356749176979065
+97,What Does Fed OASDI/EE Mean on a Paycheck?,Labor & Employment,Labor & Employment,0.7053307890892029
+33,How To Find Out If Someone Died,Family & Marriage,Family & Marriage,0.7038841247558594
+14,Why Are Steroids Illegal?,Civil & Torts,Civil & Torts,0.7018345594406128
+25,How To Disown A Relative,Family & Marriage,Family & Marriage,0.698081374168396
+73,What Are the Miranda Rights?,Criminal & Traffic,Criminal & Traffic,0.6893720626831055

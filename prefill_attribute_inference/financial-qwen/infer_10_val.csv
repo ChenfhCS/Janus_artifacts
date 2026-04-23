@@ -1,0 +1,11 @@
+﻿index,query,true_label,pred_label,pred_prob
+78,How does American Express manage and mitigate market risk?,Products & Business,Products & Business,0.729035378
+94,Which two business segments does Johnson & Johnson currently operate under?,Market & Risks,Market & Risks,0.678147316
+95,What trends significantly impact FedEx's business and operating results according to their 2023 analysis?,Governance & Management,Governance & Management,0.642971039
+81,How is the Common Equity Tier 1 Risk-Based Capital Ratio determined?,Market & Risks,Market & Risks,0.639939666
+86,How does the company approach environmental concerns in its Integrated Resort operations?,Financial Performance,Financial Performance,0.635017633
+85,What strategies does Garmin use to protect its intellectual property?,Market & Risks,Market & Risks,0.623760402
+97,What were the main components of the increased cost of sales in 2022 compared to 2021?,Market & Risks,Market & Risks,0.609352887
+50,"What sustainability-linked targets were included in Ford's credit agreements as of November 24, 2023?",Governance & Management,Governance & Management,0.581880212
+2,What are the future dividends declared per share for the fourth quarter of fiscal 2023?,Financial Performance,Financial Performance,0.563663185
+28,What significant change was made to the global supply chain program in the second quarter of 2018?,Products & Business,Products & Business,0.472786069

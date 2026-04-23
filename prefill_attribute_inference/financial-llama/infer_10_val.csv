@@ -1,0 +1,11 @@
+﻿index,query,true_label,pred_label,pred_prob
+58,"What amount was authorized for future share repurchases by the company as of October 31, 2023?",Governance & Management,Governance & Management,0.6351320147514343
+67,How many shares of common stock were repurchased in fiscal year 2023?,Governance & Management,Governance & Management,0.5734133720397949
+77,"What year was Eli Lilly and Company incorporated, and in which state did this occur?",Market & Risks,Market & Risks,0.5569339394569397
+85,What strategies does Garmin use to protect its intellectual property?,Market & Risks,Market & Risks,0.5506011843681335
+72,"How many performance share units vested at the target level for the 2021-2023 performance period as of December 31, 2023?",Governance & Management,Governance & Management,0.5220926403999329
+31,What did Masimo allege in its complaint before the U.S. International Trade Commission?,Products & Business,Products & Business,0.5017493963241577
+40,What is the role of the Privacy Risk Management Committee at American Express?,Products & Business,Products & Business,0.4993651807308197
+93,What is the primary subject of Item 3 in the report?,Market & Risks,Market & Risks,0.4976973831653595
+62,How much is the Company expected to pay per share for acquiring all outstanding shares of Ambrx's common stock?,Governance & Management,Governance & Management,0.4894406795501709
+15,"What was the guaranty fund contribution to ICE Clear Europe as of December 31, 2022?",Financial Performance,Financial Performance,0.48628202080726624

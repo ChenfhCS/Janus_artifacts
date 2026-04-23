@@ -1,0 +1,11 @@
+﻿index,query,true_label,pred_label,pred_prob
+91,OSHA Regulations For Office Temperatures,Labor & Employment,Labor & Employment,0.638684809
+82,How To Report Food Stamp Fraud,Labor & Employment,Labor & Employment,0.568181574
+50,What Is Duress?,Criminal & Traffic,Criminal & Traffic,0.563212395
+95,How To Collect Unemployment While Pregnant,Labor & Employment,Labor & Employment,0.541371763
+52,What Is Entrapment?,Criminal & Traffic,Criminal & Traffic,0.539876342
+85,How Does Libel Differ From Slander?,Labor & Employment,Labor & Employment,0.535746276
+84,How to Track My Disability Back Pay,Labor & Employment,Labor & Employment,0.528658926
+26,How to Write an Affidavit,Family & Marriage,Labor & Employment,0.528575957
+16,How To Sue For Mental Abuse,Civil & Torts,Civil & Torts,0.462785035
+42,What Rights Do Convicted Felons Lose?,Family & Marriage,Family & Marriage,0.455818892

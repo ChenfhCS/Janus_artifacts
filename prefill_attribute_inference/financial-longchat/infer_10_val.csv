@@ -1,0 +1,11 @@
+﻿index,query,true_label,pred_label,pred_prob
+94,Which two business segments does Johnson & Johnson currently operate under?,Market & Risks,Market & Risks,0.899207532
+93,What is the primary subject of Item 3 in the report?,Financial Performance,Financial Performance,0.818902671
+95,What trends significantly impact FedEx's business and operating results according to their 2023 analysis?,Market & Risks,Market & Risks,0.816748321
+84,What are the potential consequences of the company being involved in lawsuits related to their acquisitions?,Governance & Management,Governance & Management,0.810967863
+81,How is the Common Equity Tier 1 Risk-Based Capital Ratio determined?,Market & Risks,Market & Risks,0.802911103
+83,"When was NIKE, Inc. incorporated and under the laws of which state?",Products & Business,Products & Business,0.794021428
+98,What specific competitive advantages does IBM leverage in the hybrid cloud infrastructure market?,Market & Risks,Market & Risks,0.793638766
+7,"What was the total balance of Level 3 pension assets including equities, fixed income funds, and real estate and real assets as of December 31, 2023?",Financial Performance,Financial Performance,0.771489024
+73,What is the primary function of long-term funding management at Goldman Sachs as outlined in their 2023 reporting?,Governance & Management,Governance & Management,0.689290881
+42,Under what circumstances is a more frequent evaluation for impairment of goodwill and indefinite-lived intangible assets performed?,Products & Business,Products & Business,0.621093154
