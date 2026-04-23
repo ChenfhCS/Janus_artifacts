@@ -40,3 +40,77 @@ janus-artifact/
     ├── legal-longchat/
     ├── legal-llama/
     └── legal-qwen/
+```
+
+---
+
+### Components
+
+#### 1. `prefill_attribute_inference/`
+
+This directory contains the implementation of the **Prefill-Phase Prompt Attribute Inference** attack.
+It infers sensitive semantic attributes of user queries from reconstructed token-level sparsity patterns derived from prefill-phase SIMA traces.
+
+See `prefill_attribute_inference/README.md` for detailed instructions.
+
+---
+
+#### 2. `decoding_token_recovery/`
+
+This directory contains the implementation of the **Decoding-Phase Autoregressive Token Recovery** attack.
+It reconstructs generated response tokens step by step from reconstructed decoding-phase sparsity patterns derived from SIMA traces.
+
+See `decoding_token_recovery/README.md` for detailed instructions.
+
+---
+
+### Quick Start
+
+All commands below are executed from the artifact root directory:
+
+```bash
+cd janus-artifact
+```
+
+#### Run Prefill-Phase Attribute Inference
+
+For a specific dataset-model pair:
+
+```bash
+cd prefill_attribute_inference/<dataset-model>
+python load_model_infer_illness.py
+```
+
+Example:
+
+```bash
+cd prefill_attribute_inference/health-qwen
+python load_model_infer_illness.py
+```
+
+---
+
+#### Run Decoding-Phase Token Recovery
+
+For a specific dataset-model pair:
+
+```bash
+cd decoding_token_recovery/<dataset-model>
+python load_model_infer.py
+```
+
+Example:
+
+```bash
+cd decoding_token_recovery/health-qwen
+python load_model_infer.py
+```
+
+---
+
+### Notes
+
+- Each `dataset-model` directory is self-contained for one evaluation setting.
+- The prefill-phase and decoding-phase attacks are separated into different top-level directories for clarity.
+- Output prediction files are generated within the corresponding `dataset-model` directory.
+- Please run the scripts inside the corresponding `dataset-model` directory so that all relative paths resolve correctly.
