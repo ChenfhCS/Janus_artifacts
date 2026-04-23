@@ -48,19 +48,19 @@ janus-artifact/
 
 #### 1. `prefill_attribute_inference/`
 
-This directory contains the implementation of the **Prefill-Phase Prompt Attribute Inference** attack.
-It infers sensitive semantic attributes of user queries from reconstructed token-level sparsity patterns derived from prefill-phase SIMA traces.
+This directory contains the implementation of the **Prefill-Phase Query Attribute Inference** attack.  
+Each `dataset-model` subdirectory includes the pretrained model, the reconstructed sparsity-pattern inputs, the validation CSV file, and the inference script for that setting.
 
-See `prefill_attribute_inference/README.md` for detailed instructions.
+See `prefill_attribute_inference/README.md` for details.
 
 ---
 
 #### 2. `decoding_token_recovery/`
 
-This directory contains the implementation of the **Decoding-Phase Autoregressive Token Recovery** attack.
-It reconstructs generated response tokens step by step from reconstructed decoding-phase sparsity patterns derived from SIMA traces.
+This directory contains the implementation of the **Decoding-Phase Autoregressive Token Recovery** attack.  
+Each `dataset-model` subdirectory includes the pretrained model, the reconstructed decoding inputs, the evaluation CSV file, and the inference script for that setting.
 
-See `decoding_token_recovery/README.md` for detailed instructions.
+See `decoding_token_recovery/README.md` for details.
 
 ---
 
@@ -74,36 +74,32 @@ cd janus-artifact
 
 #### Run Prefill-Phase Attribute Inference
 
-For a specific dataset-model pair:
-
 ```bash
 cd prefill_attribute_inference/<dataset-model>
-python load_model_infer_illness.py
+python <prefill_inference_script>.py
 ```
 
 Example:
 
 ```bash
-cd prefill_attribute_inference/health-qwen
-python load_model_infer_illness.py
+cd prefill_attribute_inference/financial-llama
+python load_model_infer_illness_10_load_npz_speed_up.py
 ```
 
 ---
 
 #### Run Decoding-Phase Token Recovery
 
-For a specific dataset-model pair:
-
 ```bash
 cd decoding_token_recovery/<dataset-model>
-python load_model_infer.py
+python <decoding_inference_script>.py
 ```
 
 Example:
 
 ```bash
-cd decoding_token_recovery/health-qwen
-python load_model_infer.py
+cd decoding_token_recovery/financial-llama
+python load_model_infer_filter_output_resnet18_34_50.py
 ```
 
 ---
@@ -111,6 +107,5 @@ python load_model_infer.py
 ### Notes
 
 - Each `dataset-model` directory is self-contained for one evaluation setting.
-- The prefill-phase and decoding-phase attacks are separated into different top-level directories for clarity.
-- Output prediction files are generated within the corresponding `dataset-model` directory.
-- Please run the scripts inside the corresponding `dataset-model` directory so that all relative paths resolve correctly.
+- The exact script and file names may differ across settings, but the usage pattern is the same.
+- Please run the inference script inside the corresponding `dataset-model` directory so that all relative paths resolve correctly.
