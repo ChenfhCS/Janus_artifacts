@@ -82,7 +82,7 @@ python <prefill_inference_script>.py
 Example:
 
 ```bash
-cd prefill_attribute_inference/financial-llama
+cd prefill_attribute_inference/health-llama
 python load_model_infer_illness_10_load_npz_speed_up.py
 ```
 
@@ -98,7 +98,7 @@ python <decoding_inference_script>.py
 Example:
 
 ```bash
-cd decoding_token_recovery/financial-llama
+cd decoding_token_recovery/health-llama
 python load_model_infer_filter_output_resnet18_34_50.py
 ```
 
