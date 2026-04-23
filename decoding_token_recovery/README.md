@@ -43,9 +43,9 @@ Each `dataset-model` directory in `decoding_token_recovery/` contains:
 A typical example is:
 
 ```text
-financial-llama/
+health-llama/
 ├── best_resnet34_decoding.pt
-├── load_model_infer_filter_output_resnet18_34_50.py
+├── load_model_infer_filter_chunk_dropout_resnet18_34_50.py
 ├── top10_acc_kept.csv
 └── top10_cases_output/
 ```
@@ -64,8 +64,8 @@ python <decoding_inference_script>.py
 Example:
 
 ```bash
-cd decoding_token_recovery/financial-llama
-python load_model_infer_filter_output_resnet18_34_50.py
+cd decoding_token_recovery/health-llama
+python load_model_infer_filter_chunk_dropout_resnet18_34_50.py
 ```
 
 Please use the inference script provided in the selected `dataset-model` directory.
