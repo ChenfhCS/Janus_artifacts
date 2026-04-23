@@ -43,7 +43,7 @@ Each `dataset-model` directory in `prefill_attribute_inference/` contains:
 A typical example is:
 
 ```text
-financial-llama/
+health-llama/
 ├── best_resnet18_not_pca_illness_num_classes4.pt
 ├── infer_10_val/
 ├── infer_10_val.csv
@@ -64,8 +64,8 @@ python <prefill_inference_script>.py
 Example:
 
 ```bash
-cd prefill_attribute_inference/financial-llama
-python load_model_infer_illness_10_load_npz_speed_up.py
+cd prefill_attribute_inference/health-llama
+python load_model_infer_illness_one_by_one.py
 ```
 
 Please use the inference script provided in the selected `dataset-model` directory.
