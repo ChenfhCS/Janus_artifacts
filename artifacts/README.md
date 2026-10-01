@@ -1,4 +1,4 @@
-# Janus artifact refactor: offline contract milestone
+# Janus artifact refactor: controlled offline pipeline
 
 This directory adds a standard-library validation, split, vocabulary, replay, and
 metric layer around the existing Janus artifact, plus optional PyTorch QAI and ATR
@@ -17,6 +17,12 @@ reconstruction choices in the new runnable learning pipeline.
 [ATR_RECONSTRUCTION.md](ATR_RECONSTRUCTION.md) defines the executable token-learning
 contract, causal augmentation choices and real-data gaps;
 [ATR_VALIDATION.md](ATR_VALIDATION.md) records actual synthetic software checks.
+[UPSTREAM_RECONSTRUCTION.md](UPSTREAM_RECONSTRUCTION.md) defines the controlled
+toy workload, raw probe contract, reference phase alignment and representative
+page-to-token operators; [UPSTREAM_VALIDATION.md](UPSTREAM_VALIDATION.md) records
+the connected CPU replay/QAI/ATR check. Probe observations are simulated, and
+phase boundaries and gold labels remain explicit oracle annotations.
+
 
 ## Run the self-contained checks
 
@@ -88,6 +94,12 @@ python -m artifacts.janus_artifact.cli qai-synthetic-smoke \
 
 python -m artifacts.janus_artifact.cli atr-synthetic-smoke \
   --work-dir /tmp/janus-atr-smoke \
+  --device cpu
+
+# Controlled toy operation -> simulated probes -> profiles -> replay/QAI/ATR.
+# The destination must be new; existing files are preserved.
+python -m artifacts.janus_artifact.cli upstream-synthetic-smoke \
+  --work-dir /tmp/janus-upstream-smoke \
   --device cpu
 ```
 

@@ -145,6 +145,19 @@ def build_parser() -> argparse.ArgumentParser:
     atr_smoke = commands.add_parser("atr-synthetic-smoke")
     atr_smoke.add_argument("--work-dir", required=True)
     atr_smoke.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
+
+    upstream_generate = commands.add_parser("upstream-generate")
+    upstream_generate.add_argument("--config", required=True)
+    upstream_generate.add_argument("--output", required=True)
+
+    upstream_reconstruct = commands.add_parser("upstream-reconstruct")
+    upstream_reconstruct.add_argument("--input", required=True)
+    upstream_reconstruct.add_argument("--config", required=True)
+    upstream_reconstruct.add_argument("--output", required=True)
+
+    upstream_smoke = commands.add_parser("upstream-synthetic-smoke")
+    upstream_smoke.add_argument("--work-dir", required=True)
+    upstream_smoke.add_argument("--device", choices=("cpu",), default="cpu")
     return parser
 
 
@@ -349,6 +362,43 @@ def run(arguments: argparse.Namespace) -> dict:
         from .atr import run_synthetic_atr_smoke
 
         return run_synthetic_atr_smoke(arguments.work_dir, device=arguments.device)
+    if arguments.command == "upstream-generate":
+        from .workload import (
+            WorkloadConfig, generate_controlled_workload, write_controlled_workload,
+        )
+
+        bundle = generate_controlled_workload(WorkloadConfig.from_json(arguments.config))
+        write_controlled_workload(bundle, arguments.output)
+        counts = {
+            split: sum(record["split"] == split for record in bundle["runs"])
+            for split in ("train", "validation", "test")
+        }
+        return {
+            "status": "ok", "source_kind": "synthetic_probe_simulation",
+            "scientific_result": False, "runs": len(bundle["runs"]),
+            "split_counts": counts, "output": arguments.output,
+        }
+    if arguments.command == "upstream-reconstruct":
+        from .probe_contract import load_probe_runs
+        from .probe_reconstruction import ReconstructionConfig, reconstruct_probe_run
+
+        records = load_probe_runs(arguments.input)
+        config = ReconstructionConfig.from_json(arguments.config)
+        profiles = [reconstruct_probe_run(record, config) for record in records]
+        _write_json(arguments.output, {
+            "schema_version": "janus.probe.reconstruction.batch.v1",
+            "scientific_result": False, "profiles": profiles,
+        })
+        return {
+            "status": "ok", "scientific_result": False, "runs": len(profiles),
+            "decoding_steps": sum(len(row["decoding_steps"]) for row in profiles),
+            "phase_source_kind": "oracle_aligned_phase",
+            "output": arguments.output,
+        }
+    if arguments.command == "upstream-synthetic-smoke":
+        from .upstream_bridge import run_upstream_smoke
+
+        return run_upstream_smoke(arguments.work_dir, device=arguments.device)
     raise AssertionError(f"unhandled command: {arguments.command}")
 
 

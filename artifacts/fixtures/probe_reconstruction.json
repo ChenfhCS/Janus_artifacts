@@ -1,0 +1,10 @@
+{
+  "alignment_tie_policy": "earlier",
+  "decoding_density_radius": 1,
+  "decoding_placement": "prefix",
+  "density_rounding": "ceil",
+  "majority_tie_policy": "reject",
+  "max_alignment_error_ns": 5,
+  "min_decode_votes": 3,
+  "prefill_max_exponent": 2.0
+}

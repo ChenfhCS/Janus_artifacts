@@ -24,7 +24,7 @@ Required top-level fields:
 | `refactored_legacy` | Adapted from an existing artifact without changing its scientific origin | `legacy_path`; payload or explicit `lfs_pointer_only` status |
 | `oracle_annotation` | Ground truth or labels obtained through instrumentation/white-box access | `oracle_method`; never presented as an observable side channel |
 | `replay_derived` | Deterministic output derived from recorded inputs | non-empty `parent_trace_ids`; replay digest |
-| `synthetic_fixture` | Hand-authored test data | `synthetic: true`; never used for scientific claims |
+| `synthetic_fixture` | Hand-authored or generated synthetic test data | `synthetic: true`; never used for scientific claims |
 
 ## Phase-aware observation shapes
 
@@ -41,5 +41,16 @@ Required top-level fields:
   and array digests.
 
 `labels` are evaluation-only. They must not be treated as data available to the
-online attacker. This first milestone does not implement a collector, an oracle,
-or the paper's probabilistic reconstruction algorithms.
+online attacker. The initial trace/replay milestone supplies a serialization
+boundary without a collector or reconstruction operator.
+
+The separate controlled upstream module now supplies a deterministic CPU toy
+operation, simulated raw probes, explicit oracle phase/gold annotations and
+representative numerical reconstruction under configured choices. Its bridge
+emits separate page and token records as synthetic_fixture with derivation
+provenance; canonical replay uses replay_derived. The raw input source class
+is retained in provenance, rather than changing the trace into real_collection; replay still
+does not promote page records into token records. See
+[UPSTREAM_RECONSTRUCTION.md](UPSTREAM_RECONSTRUCTION.md) for its stricter
+janus.probe.run.v1 contract and source meanings. No physical collector or
+author-matched probabilistic reconstruction is supplied.
