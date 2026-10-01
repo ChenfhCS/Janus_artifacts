@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.coverage
+replay-output/
+test-output/
+*.log
+*.pt
+*.pth
+*.bin
+*.npy
+*.npz
+._*

@@ -1,0 +1,2 @@
+{"case_id":"synthetic-case-prefill","legacy_path":"synthetic/prefill/payload.npz","oid_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","phase":"prefill","size_bytes":123}
+{"case_id":"synthetic-case-decoding","legacy_path":"synthetic/decoding/payload.npz","oid_sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","phase":"decoding","response_id":"synthetic-response-decoding","size_bytes":456}

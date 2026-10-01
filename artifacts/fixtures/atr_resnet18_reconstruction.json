@@ -1,0 +1,14 @@
+{
+  "architecture": "resnet18",
+  "token_width": 0,
+  "base_channels": 64,
+  "batch_size": 32,
+  "epochs": 20,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "seed": 1337,
+  "num_workers": 0,
+  "normalization": "none",
+  "sequential_augmentation": "causal_running_mean",
+  "augmentation_strength": 0.5
+}
