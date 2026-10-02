@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import os
+import stat
 import sys
 from pathlib import Path
 
@@ -29,6 +32,216 @@ def _write_json(path: str, value: dict) -> None:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+MAX_SELECTOR_SCORES_FILE_BYTES = 64 * 1024 * 1024
+MAX_SELECTOR_SCORE_LINE_BYTES = 64 * 1024
+MAX_SELECTOR_MANIFEST_FILE_BYTES = 64 * 1024 * 1024
+
+
+def _selector_input_signature(info: os.stat_result) -> tuple:
+    return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+def _selector_check_input_stat(info: os.stat_result, budget: int, label: str) -> None:
+    if not stat.S_ISREG(info.st_mode):
+        raise ValidationError(f"{label} must be a regular file")
+    if info.st_size > budget:
+        raise ValidationError(f"{label} byte budget exceeded")
+
+
+def _selector_open_input(path: str, budget: int, label: str):
+    """Check path and descriptor budgets before allocating input bytes."""
+    try:
+        source = Path(path)
+        before = source.stat()
+        _selector_check_input_stat(before, budget, label)
+        descriptor = os.open(source, os.O_RDONLY | os.O_NONBLOCK)
+        try:
+            opened = os.fstat(descriptor)
+            _selector_check_input_stat(opened, budget, label)
+            if _selector_input_signature(before) != _selector_input_signature(opened):
+                raise ValidationError(f"{label} changed while opening")
+            handle = os.fdopen(descriptor, "rb")
+        except BaseException:
+            os.close(descriptor)
+            raise
+        return handle, opened
+    except OSError as exc:
+        raise ValidationError(f"cannot read {label}: {exc}") from exc
+
+
+def _selector_finish_input(handle, opened: os.stat_result, total: int,
+                           budget: int, label: str) -> None:
+    after = os.fstat(handle.fileno())
+    _selector_check_input_stat(after, budget, label)
+    if total != opened.st_size or _selector_input_signature(after) != _selector_input_signature(opened):
+        raise ValidationError(f"{label} changed during bounded read")
+
+
+def _selector_parse_input(raw: bytes, label: str):
+    def unique_object(pairs):
+        value = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValidationError(f"duplicate {label} JSON key: {key}")
+            value[key] = item
+        return value
+
+    def reject_constant(value):
+        raise ValidationError(f"nonfinite {label} JSON number: {value}")
+
+    def finite_float(value):
+        number = float(value)
+        if not math.isfinite(number):
+            raise ValidationError(f"nonfinite {label} JSON number")
+        return number
+
+    try:
+        return json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object,
+                          parse_constant=reject_constant, parse_float=finite_float)
+    except (UnicodeError, ValueError, RecursionError) as exc:
+        if isinstance(exc, ValidationError):
+            raise
+        raise ValidationError(f"invalid {label} JSON: {exc}") from exc
+
+
+def _load_selector_score_rows(path: str, max_rows: int) -> list[dict]:
+    """Bound each physical line, including newline, before decoding/parse."""
+    if type(max_rows) is not int or max_rows < 1:
+        raise ValidationError("selector score row budget must be a positive integer")
+    label = "selector scores"
+    try:
+        handle, opened = _selector_open_input(path, MAX_SELECTOR_SCORES_FILE_BYTES, label)
+        with handle:
+            rows = []
+            total = 0
+            while True:
+                read_limit = min(MAX_SELECTOR_SCORE_LINE_BYTES + 1,
+                                 MAX_SELECTOR_SCORES_FILE_BYTES - total + 1)
+                raw = handle.readline(read_limit)
+                if not raw:
+                    break
+                total += len(raw)
+                if total > MAX_SELECTOR_SCORES_FILE_BYTES:
+                    raise ValidationError("selector scores byte budget exceeded")
+                if len(raw) > MAX_SELECTOR_SCORE_LINE_BYTES:
+                    raise ValidationError("selector score physical line byte budget exceeded")
+                if not raw.strip():
+                    continue
+                if len(rows) >= max_rows:
+                    raise ValidationError("selector score row budget exceeded")
+                row = _selector_parse_input(raw, "selector score row")
+                if type(row) is not dict:
+                    raise ValidationError("selector score row must be a JSON object")
+                rows.append(row)
+            _selector_finish_input(handle, opened, total, MAX_SELECTOR_SCORES_FILE_BYTES, label)
+        return rows
+    except OSError as exc:
+        raise ValidationError(f"cannot read {label}: {exc}") from exc
+
+
+def _load_selector_manifest(path: str) -> dict:
+    """Read only budget plus one sentinel, then check stability and parse."""
+    label = "selector manifest"
+    try:
+        handle, opened = _selector_open_input(path, MAX_SELECTOR_MANIFEST_FILE_BYTES, label)
+        with handle:
+            raw = handle.read(MAX_SELECTOR_MANIFEST_FILE_BYTES + 1)
+            if len(raw) > MAX_SELECTOR_MANIFEST_FILE_BYTES:
+                raise ValidationError("selector manifest byte budget exceeded")
+            _selector_finish_input(handle, opened, len(raw), MAX_SELECTOR_MANIFEST_FILE_BYTES, label)
+        manifest = _selector_parse_input(raw, label)
+        if type(manifest) is not dict:
+            raise ValidationError("selector manifest must be a JSON object")
+        return manifest
+    except OSError as exc:
+        raise ValidationError(f"cannot read {label}: {exc}") from exc
+
+
+def _selector_finite_json(value: dict) -> str:
+    if not isinstance(value, dict):
+        raise ValidationError("selector output must be a JSON object")
+    try:
+        return json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    except (TypeError, ValueError) as exc:
+        raise ValidationError("selector output must contain finite JSON values") from exc
+
+
+def _selector_manifest_chunks(value: dict):
+    """Yield compact canonical UTF-8 chunks without retaining the full JSON."""
+    if not isinstance(value, dict):
+        raise ValidationError("selector output must be a JSON object")
+    encoder = json.JSONEncoder(sort_keys=True, separators=(",", ":"),
+                               ensure_ascii=False, allow_nan=False)
+    try:
+        for chunk in encoder.iterencode(value):
+            yield chunk.encode("utf-8")
+        yield b"\n"
+    except (TypeError, ValueError, UnicodeError, RecursionError) as exc:
+        raise ValidationError("selector output must contain finite JSON values encoded as UTF-8") from exc
+
+
+def _write_new_selector_json(path: str, value: dict) -> None:
+    """Preflight a bounded manifest, then stream into an exclusive private file."""
+    expected_bytes = 0
+    for chunk in _selector_manifest_chunks(value):
+        expected_bytes += len(chunk)
+        if expected_bytes > MAX_SELECTOR_MANIFEST_FILE_BYTES:
+            raise ValidationError("selector manifest byte budget exceeded")
+    destination = Path(path)
+    missing_parents: list[Path] = []
+    parent = destination.parent
+    while not parent.exists():
+        missing_parents.append(parent)
+        parent = parent.parent
+    for directory in reversed(missing_parents):
+        try:
+            directory.mkdir(mode=0o700)
+        except FileExistsError:
+            if not directory.is_dir():
+                raise
+    descriptor = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    owned = None
+    try:
+        owned = os.fstat(descriptor)
+        # Keep the owned inode open through cleanup even if the stream closes.
+        with os.fdopen(descriptor, "wb", closefd=False) as handle:
+            total = 0
+            for chunk in _selector_manifest_chunks(value):
+                total += len(chunk)
+                if total > MAX_SELECTOR_MANIFEST_FILE_BYTES:
+                    raise ValidationError("selector manifest byte budget exceeded")
+                if handle.write(chunk) != len(chunk):
+                    raise OSError("short selector manifest write")
+            if total != expected_bytes:
+                raise ValidationError("selector manifest encoding changed between passes")
+        try:
+            current = destination.lstat()
+        except FileNotFoundError as exc:
+            raise ValidationError("selector output changed during bounded write") from exc
+        actual = os.fstat(descriptor)
+        if ((current.st_dev, current.st_ino) != (owned.st_dev, owned.st_ino)
+                or current.st_size != expected_bytes or actual.st_size != expected_bytes):
+            raise ValidationError("selector output changed during bounded write")
+        closing_descriptor, descriptor = descriptor, None
+        os.close(closing_descriptor)
+    except BaseException:
+        if owned is not None:
+            try:
+                current = destination.lstat()
+            except FileNotFoundError:
+                pass
+            else:
+                if (current.st_dev, current.st_ino) == (owned.st_dev, owned.st_ino):
+                    destination.unlink()
+        raise
+    finally:
+        if descriptor is not None:
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -158,6 +371,25 @@ def build_parser() -> argparse.ArgumentParser:
     upstream_smoke = commands.add_parser("upstream-synthetic-smoke")
     upstream_smoke.add_argument("--work-dir", required=True)
     upstream_smoke.add_argument("--device", choices=("cpu",), default="cpu")
+    owned_timing = commands.add_parser(
+        "owned-gpu-timing-benchmark",
+        help="Two owned CUDA workers with exact CPU ground truth and bounded cleanup",
+    )
+    owned_timing.add_argument("--work-dir", required=True)
+    owned_timing.add_argument("--steps", type=int, default=3)
+    owned_timing.add_argument("--elements", type=int, default=65536)
+    owned_timing.add_argument("--timeout-seconds", type=float, default=20.0)
+    selector_build = commands.add_parser("selector-build")
+    selector_build.add_argument("--config", required=True)
+    selector_build.add_argument("--scores", required=True)
+    selector_build.add_argument("--output", required=True)
+
+    selector_validate = commands.add_parser("selector-validate")
+    selector_validate.add_argument("--manifest", required=True)
+    selector_validate.add_argument("--expected-config", required=True)
+
+    selector_smoke = commands.add_parser("selector-replay-smoke")
+    selector_smoke.add_argument("--work-dir", required=True)
     return parser
 
 
@@ -399,16 +631,58 @@ def run(arguments: argparse.Namespace) -> dict:
         from .upstream_bridge import run_upstream_smoke
 
         return run_upstream_smoke(arguments.work_dir, device=arguments.device)
+    if arguments.command == "owned-gpu-timing-benchmark":
+        from .owned_gpu_timing import OwnedGPUTimingConfig, run_owned_gpu_timing
+
+        config = OwnedGPUTimingConfig(
+            steps=arguments.steps, elements=arguments.elements,
+            timeout_seconds=arguments.timeout_seconds,
+        )
+        return run_owned_gpu_timing(arguments.work_dir, config)
+    if arguments.command == "selector-build":
+        from .selector_replay import SelectorReplayConfig, build_selector_manifest
+
+        config = SelectorReplayConfig.from_json(arguments.config)
+        max_rows = len(config.teacher_forced_token_ids) * config.layers * config.query_heads
+        manifest = build_selector_manifest(config, _load_selector_score_rows(arguments.scores, max_rows))
+        _write_new_selector_json(arguments.output, manifest)
+        return {
+            "status": "ok", "manifest_sha256": manifest["manifest_sha256"],
+            "steps": len(manifest["steps"]),
+            "source_kind": manifest["config"]["source_kind"],
+            "scientific_result": False, "output": arguments.output,
+        }
+    if arguments.command == "selector-validate":
+        from .selector_replay import SelectorReplayConfig, validate_selector_manifest
+
+        config = SelectorReplayConfig.from_json(arguments.expected_config)
+        manifest = _load_selector_manifest(arguments.manifest)
+        validated = validate_selector_manifest(manifest, expected_config=config)
+        return {
+            "status": "ok", "manifest_sha256": validated["manifest_sha256"],
+            "steps": len(validated["steps"]),
+            "source_kind": validated["config"]["source_kind"],
+            "scientific_result": False,
+        }
+    if arguments.command == "selector-replay-smoke":
+        from .selector_smoke import run_selector_replay_smoke
+
+        report = run_selector_replay_smoke(arguments.work_dir)
+        _selector_finite_json(report)
+        return report
     raise AssertionError(f"unhandled command: {arguments.command}")
 
 
 def main(argv: list[str] | None = None) -> int:
     try:
-        result = run(build_parser().parse_args(argv))
+        arguments = build_parser().parse_args(argv)
+        result = run(arguments)
     except (OSError, json.JSONDecodeError, ValidationError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
-    print(json.dumps(result, indent=2, sort_keys=True))
+    print(json.dumps(result, indent=2, sort_keys=True, allow_nan=False))
+    if arguments.command in {"owned-gpu-timing-benchmark", "selector-replay-smoke"} and result.get("status") != "ok":
+        return 2
     return 0
 
 

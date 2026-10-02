@@ -23,6 +23,19 @@ page-to-token operators; [UPSTREAM_VALIDATION.md](UPSTREAM_VALIDATION.md) record
 the connected CPU replay/QAI/ATR check. Probe observations are simulated, and
 phase boundaries and gold labels remain explicit oracle annotations.
 
+[OWNED_GPU_TIMING.md](OWNED_GPU_TIMING.md) describes a separate bounded CUDA
+timing and exact CPU ground-truth benchmark using two owned workers. It has no
+cache/TLB collector or model workload; actual cross-context GPU overlap stays
+unknown without a shared GPU timebase or profiler evidence.
+[OWNED_GPU_TIMING_VALIDATION.md](OWNED_GPU_TIMING_VALIDATION.md) records the
+actual full regression and the preserved failed post-idle hardware result.
+[SELECTOR_REPLAY.md](SELECTOR_REPLAY.md) defines the replaceable offline selector,
+static KV cache, selected-row attention and separate probe request boundary.
+It has an executable synthetic CPU closure; real model and probe integration
+remain pending.
+[SELECTOR_REPLAY_VALIDATION.md](SELECTOR_REPLAY_VALIDATION.md) records the final
+CPU regression and actual CLI closure.
+
 
 ## Run the self-contained checks
 
