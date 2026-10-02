@@ -1,0 +1,3 @@
+{"attribute":"topic","attribute_present":true,"gold_value":"alpha","predicted_value":"alpha","record_id":"query-1"}
+{"attribute":"topic","attribute_present":true,"gold_value":"beta","predicted_value":null,"record_id":"query-2"}
+{"attribute":"topic","attribute_present":false,"gold_value":null,"predicted_value":"alpha","record_id":"query-3"}

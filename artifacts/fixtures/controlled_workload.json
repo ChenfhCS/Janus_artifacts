@@ -1,0 +1,13 @@
+{
+  "case_count": 24,
+  "decode_rounds": 5,
+  "kv_heads": 4,
+  "layers": 4,
+  "noise_rate": 0.02,
+  "pages_per_head": 4,
+  "prefill_rounds": 4,
+  "seed": 19,
+  "split_seed": "janus-upstream-v1",
+  "steps_per_response": 3,
+  "tokens_per_page": 2
+}

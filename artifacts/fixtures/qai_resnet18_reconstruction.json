@@ -1,0 +1,14 @@
+{
+  "architecture": "resnet18",
+  "base_channels": 64,
+  "batch_size": 32,
+  "epochs": 20,
+  "learning_rate": 0.001,
+  "num_workers": 0,
+  "rank_selection": "largest_values",
+  "seed": 1337,
+  "selected_ranks": 10,
+  "token_length_policy": "pad_to_train_max_reject_longer",
+  "token_width": 0,
+  "weight_decay": 0.0001
+}

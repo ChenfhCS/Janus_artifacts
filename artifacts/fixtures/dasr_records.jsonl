@@ -1,0 +1,2 @@
+{"gold_tokens":["A","B","OOV"],"predicted_tokens":["A","B","OOV"],"response_id":"response-1"}
+{"gold_tokens":["B","A"],"predicted_tokens":["B"],"response_id":"response-2"}
